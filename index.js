@@ -33,7 +33,7 @@ app.post("/signup", async (req, res) => {
       return res.status(400).json({ success: false, message: "Passwords do not match" });
     }
 
-  if (!name || !email || !password || confrimPass) {
+  if (!name || !email || !password || !confirmPass) {
     return res.status(400).json({ error: "Name, email, and password are required" });
   }
 
