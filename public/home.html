@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+</head>
+<body>
+  <h1 id="welcome">Loading...</h1>
+  <p id="details"></p>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    async function fetchUser() {
+      try {
+        const res = await fetch("/me", {
+          method: "GET",
+          credentials: "include"  // important: sends cookies with request
+        });
+
+        if (!res.ok) {
+          throw new Error("Not authorized");
+        }
+
+        const data = await res.json();
+
+        document.getElementById("welcome").innerText = `Welcome, ${data.name}`;
+        document.getElementById("details").innerText = `Email: ${data.email}`;
+      } catch (err) {
+        console.error("Fetch user error:", err);
+        document.getElementById("welcome").innerText = "Please login first";
+      }
+    }
+
+    function logout() {
+      document.cookie = "token=; Max-Age=0; path=/;"; // delete cookie
+      window.location.href = "/"; // back to login page
+    }
+
+    fetchUser();
+  </script>
+</body>
+</html>
