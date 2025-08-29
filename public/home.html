@@ -8,8 +8,13 @@
   <h1 id="welcome">Loading...</h1>
   <p id="details"></p>
   <button onclick="logout()">Logout</button>
+  
 
   <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const audio = new Audio("/kyu-re-madarchod-cid.mp3"); // Place welcome.mp3 in your public folder
+      audio.play();
+    });
     async function fetchUser() {
       try {
         const res = await fetch("/me", {
