@@ -3,14 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <title>Home</title>
+  <style>
+    #videoContainer {
+      display: none;
+      margin-top: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+  </style>
 </head>
+
 <body>
   <h1 id="welcome">Loading...</h1>
   <p id="details"></p>
   <button onclick="logout()">Logout</button>
   
+  <h2>Enter Password to Watch Video</h2>
+  <input type="password" id="passwordInput" placeholder="Enter Password">
+  <button onclick="checkPassword()">Submit</button>
+
+  <div id="videoContainer">
+    <video id="protectedVideo" width="600" controls>
+      <source src="yourvideo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    
+  </div>
 
   <script>
+    const correctPassword = "12345"; // 🔑 Set your password here
+
+    function checkPassword() {
+      const input = document.getElementById("passwordInput").value;
+      if (input === correctPassword) {
+        document.getElementById("videoContainer").style.display = "block";
+        document.getElementById("protectedVideo").play();
+        
+      } else {
+        alert("Incorrect Password!");
+      }
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       const audio = new Audio("/kyu-re-madarchod-cid.mp3"); // Place welcome.mp3 in your public folder
       audio.play();
