@@ -71,24 +71,27 @@ app.post("/signin", async (req, res) => {
 
     const token = jwt.sign(
       { email: user.email, userId: user._id },
-      process.env.JWT_SECRET || "secert_jwt_key",
+      process.env.JWT_SECRET || "secret_jwt_key", // typo fixed
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: false });
-    
+    // set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // change to true in production with HTTPS
+      sameSite: "strict",
+    });
+
     res.status(200).json({
       message: "Login successful",
       user: { id: user._id, email: user.email, name: user.name },
-      
     });
   } catch (err) {
     console.error("Signin Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
-
-app.get('/home', (req, res) => {
+app.get('/home', authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "home.html"));
 });
 
@@ -202,6 +205,10 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
+app.post("/logout", (req, res) => {
+  res.clearCookie("token");
+  /* res.json({ message: "Logged out" }); */
+});
 
 
 const PORT = process.env.PORT || 5000;

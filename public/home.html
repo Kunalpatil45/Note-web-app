@@ -6,8 +6,19 @@
   <style>
     #videoContainer {
       display: none;
-      margin-top: 20px;
-    }
+  position: relative;
+  width: 100%;
+  max-width: 300px; /* keeps video nice and not too big */
+  margin: auto;
+  overflow: hidden;
+  border-radius: 12px; /* rounded corners */
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+}
+#videoContainer video {
+  width: 100%;
+  height: auto; /* keeps aspect ratio */
+  display: block;
+}
     input, button {
       padding: 10px;
       margin: 5px;
@@ -19,15 +30,15 @@
 <body>
   <h1 id="welcome">Loading...</h1>
   <p id="details"></p>
-  <button onclick="logout()">Logout</button>
+  <!-- <button onclick="logout()">Logout</button> -->
   
-  <h2>Enter Password to Watch Video</h2>
+  <h2 id="text-change">Enter Password to Watch Video</h2>
   <input type="password" id="passwordInput" placeholder="Enter Password">
   <button onclick="checkPassword()">Submit</button>
 
   <div id="videoContainer">
-    <video id="protectedVideo" width="600" controls>
-      <source src="yourvideo.mp4" type="video/mp4">
+    <video id="protectedVideo" width="600" controlslist="nodownload noremoteplayback noplaybackrate">
+      <source src="/don.mp4" type="video/mp4" >
       Your browser does not support the video tag.
     </video>
     
@@ -41,14 +52,17 @@
       if (input === correctPassword) {
         document.getElementById("videoContainer").style.display = "block";
         document.getElementById("protectedVideo").play();
+        document.getElementById("text-change").innerText = "want more videos? subscribe now";
+        document.getElementById("text-change").style.color = "pink";
         
       } else {
-        alert("Incorrect Password!");
+        document.getElementById("text-change").innerText = "wrong password, try again!";
+        document.getElementById("text-change").style.color = "red";
       }
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      const audio = new Audio("/kyu-re-madarchod-cid.mp3"); // Place welcome.mp3 in your public folder
+      const audio = new Audio("assets/audio/mysound.mp3"); // Place welcome.mp3 in your public folder
       audio.play();
     });
     async function fetchUser() {
@@ -66,16 +80,21 @@
 
         document.getElementById("welcome").innerText = `Welcome, ${data.name}`;
         document.getElementById("details").innerText = `Email: ${data.email}`;
+        
       } catch (err) {
         console.error("Fetch user error:", err);
         document.getElementById("welcome").innerText = "Please login first";
       }
     }
 
-    function logout() {
-      document.cookie = "token=; Max-Age=0; path=/;"; // delete cookie
-      window.location.href = "/"; // back to login page
-    }
+    /* function logout() {
+      fetch("/logout", {
+        method: "POST",
+        credentials: "include"
+      }).then(() => {
+        window.location.href = "/";
+      });
+    } */
 
     fetchUser();
   </script>
