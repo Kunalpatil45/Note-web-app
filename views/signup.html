@@ -242,7 +242,8 @@
       throw new Error(data.error || "Signup failed");
     }
     else{
-      showAlert("kyu re maderchod", "success");
+      showAlert("kyu re maderchod User Created", "success");
+      document.getElementById('signin-btn').click();
     }
 
     console.log("Success:", data);
