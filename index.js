@@ -12,6 +12,7 @@ const User = require('./models/User');
 const cookieParser = require('cookie-parser');
 const authMiddleware = require('./middleware/auth'); 
 const nodemailer = require("nodemailer");
+const Note = require('./models/Note'); // Note model
 
 
 const app = express();
@@ -92,7 +93,7 @@ app.post("/signin", async (req, res) => {
   }
 });
 app.get('/home', authMiddleware, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "home.html"));
+  res.sendFile(path.join(__dirname, "public", "main.html"));
 });
 
 
@@ -109,6 +110,10 @@ app.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
+
+app.get('/himanshu', (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "home.html"));
+});
 
 // serve frontend (AFTER routes)
 app.use(express.static(path.join(__dirname, "public")));
@@ -206,10 +211,58 @@ app.post("/reset-password", async (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("token");
-  /* res.json({ message: "Logged out" }); */
+  try {
+    // If using JWT stored in cookie
+    res.clearCookie("token"); 
+    return res.status(200).json({ message: "Logged out successfully" });
+
+    
+  } catch (err) {
+    console.error("Logout error:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 });
 
+app.post("/create", authMiddleware, async (req, res) => {
+  try {
+    const { title, content } = req.body;
+
+    const note = new Note({
+      title,
+      content,
+      user: req.user.userId   // ✅ attach logged-in user
+    });
+
+    await note.save();
+    res.status(201).json({ success: true, note });
+  } catch (err) {
+    console.error("Error creating note:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+app.get("/notes", authMiddleware, async (req, res) => {
+  try {
+    const notes = await Note.find({ user: req.user.userId }).sort({ createdAt: -1 });
+    res.json(notes);
+  } catch (err) {
+    console.error("Error fetching notes:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+
+app.get("/notes/:id", authMiddleware, async (req, res) => {
+  try {
+    const note = await Note.findOne({ _id: req.params.id, userId: req.user.userId });
+    if (!note) return res.status(404).json({ error: "Note not found" });
+    res.json(note);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 

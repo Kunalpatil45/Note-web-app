@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Notes App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <!-- <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <a href="/" class="text-xl sm:text-2xl font-bold text-blue-700 hover:text-blue-800 transition">NotesApp</a>
+
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        
+        <span id="userInfo" class="text-gray-700 text-sm sm:text-base font-medium hidden xs:inline">
+          Hello, <span class="text-blue-700">Loading...</span>
+        </span>
+        <button id="logoutBtn" class="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-md text-sm sm:text-base hover:bg-red-600">
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav> -->
+
+  <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="/" class="text-xl sm:text-2xl font-bold text-blue-700 hover:text-blue-800 transition">NotesApp</a>
+
+    <div class="flex items-center space-x-3 sm:space-x-4">
+      <!-- Profile picture -->
+      <img 
+        id="profilePic"
+        src="https://www.gravatar.com/avatar/?d=mp&s=200" 
+        alt="Profile"
+        class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-gray-300 object-cover"
+      />
+
+      <!-- User info -->
+      <span id="userInfo" class="text-gray-700 text-sm sm:text-base font-medium hidden xs:inline">
+        Hello, <span class="text-blue-700">Loading...</span>
+      </span>
+
+      <!-- Logout button -->
+      <button id="logoutBtn" class="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-md text-sm sm:text-base hover:bg-red-600">
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
+
+  <!-- Main content -->
+  <main class="flex-grow pt-24 max-w-6xl mx-auto px-4 sm:px-6 w-full">
+
+    <!-- Create Note Section -->
+    <section class="bg-white rounded-xl shadow-lg p-6 sm:p-8 mb-10">
+      <h1 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 text-center">Create a New Note</h1>
+
+      <form id="noteForm" class="space-y-5 max-w-3xl mx-auto">
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          required
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm sm:text-base"
+        />
+        <textarea
+          name="content"
+          rows="6"
+          placeholder="Write your note here..."
+          required
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none text-sm sm:text-base"
+        ></textarea>
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition transform hover:scale-105 shadow-lg text-sm sm:text-base"
+        >
+          Add Note
+        </button>
+      </form>
+    </section>
+
+    <!-- Notes Section -->
+    <section>
+      <h2 class="text-xl sm:text-2xl font-semibold text-blue-700 mb-6 text-center">Your Notes</h2>
+      <div id="notesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <!-- Notes will be injected here -->
+      </div>
+      <p id="noNotesMsg" class="text-gray-500 text-center mt-6 sm:mt-8 hidden text-sm sm:text-base">No notes to show.</p>
+    </section>
+
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    // Fetch logged-in user info
+    async function fetchUser() {
+      try {
+        const res = await fetch("/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          document.querySelector("#userInfo span").textContent = data.name;
+        } else {
+          window.location.href = "/";
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Fetch notes
+    async function fetchNotes() {
+      try {
+        const res = await fetch("/notes", { credentials: "include" });
+        const container = document.getElementById("notesContainer");
+        const msg = document.getElementById("noNotesMsg");
+        container.innerHTML = "";
+
+        if (res.ok) {
+          const notes = await res.json();
+          if (notes.length === 0) {
+            msg.classList.remove("hidden");
+          } else {
+            msg.classList.add("hidden");
+            notes.forEach(note => {
+              const div = document.createElement("div");
+              div.className = "bg-white rounded-lg shadow-md p-4 sm:p-6 flex flex-col justify-between hover:shadow-xl transition-shadow";
+
+              div.innerHTML = `
+                <h3 class="text-base sm:text-lg font-semibold text-blue-700 mb-3 truncate" title="${note.title}">
+                  ${note.title}
+                </h3>
+                <p class="text-gray-700 mb-4 text-sm sm:text-base">${note.content}</p>
+              `;
+              container.appendChild(div);
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching notes:", err);
+      }
+    }
+
+    // Handle note form submit
+    document.getElementById("noteForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const title = formData.get("title");
+      const content = formData.get("content");
+
+      const res = await fetch("/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ title, content }),
+      });
+
+      if (res.ok) {
+        e.target.reset();
+        fetchNotes();
+      } else {
+        alert("Error creating note");
+      }
+    });
+
+    // Handle logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await fetch("/logout", { method: "POST", credentials: "include" });
+      window.location.href = "/";
+    });
+
+    // Initial load
+    fetchUser();
+    fetchNotes();
+  </script>
+
+</body>
+</html>
