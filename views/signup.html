@@ -242,7 +242,7 @@
       throw new Error(data.error || "Signup failed");
     }
     else{
-      showAlert("kyu re maderchod User Created", "success");
+      showAlert("Account created successfully! Please sign in.", "success");
       document.getElementById('signin-btn').click();
     }
 
@@ -292,7 +292,7 @@
       document.getElementById('signup-form').classList.add('form-hidden');
     });
 
-    // Form validation
+    
     document.getElementById('signup-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const password = document.getElementById('signup-password').value;
