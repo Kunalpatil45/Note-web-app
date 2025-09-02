@@ -223,6 +223,10 @@ app.post("/logout", (req, res) => {
   }
 });
 
+app.get("/signup", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "signup.html"));
+});
+
 app.post("/create", authMiddleware, async (req, res) => {
   try {
     const { title, content } = req.body;

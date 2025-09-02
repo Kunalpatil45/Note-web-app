@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Notes App</title>
+  <title>Notes </title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
 
@@ -95,6 +96,25 @@
 
   <!-- Scripts -->
   <script>
+
+    function showAlert(message, type = "primary") {
+      const container = document.getElementById("alert-container");
+
+      const alert = document.createElement("div");
+      alert.className = `alert alert-${type} alert-dismissible fade show shadow-lg mb-2`;
+      alert.role = "alert";
+      alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+
+      container.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 3000);
+    }
+
     // Fetch logged-in user info
     async function fetchUser() {
       try {
@@ -159,15 +179,17 @@
 
       if (res.ok) {
         e.target.reset();
+        showAlert("Note created successfully!", "success");
         fetchNotes();
       } else {
-        alert("Error creating note");
+        showAlert("Failed to create note.", "danger");
       }
     });
 
     // Handle logout
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await fetch("/logout", { method: "POST", credentials: "include" });
+      showAlert("Logged out successfully.", "success");
       window.location.href = "/";
     });
 
