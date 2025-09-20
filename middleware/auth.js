@@ -1,17 +1,18 @@
 const jwt = require("jsonwebtoken");
 
 function authMiddleware(req, res, next) {
-  const token = req.cookies.token;   // requires cookie-parser
+  const token = req.cookies.token;
   if (!token) {
-    return res.redirect("/",);  // redirect instead of JSON
+    res.redirect("/signup");
+    return; // <- Ensure no further processing
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret_jwt_key");
-    req.user = decoded; // add user info to request
+    req.user = decoded;    
     next();
   } catch (err) {
-    return res.redirect("/");  // redirect if invalid/expired
+    return res.status(401).json({ message: "Token invalid or expired" }); // <- JSON instead of redirect
   }
 }
 

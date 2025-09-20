@@ -106,14 +106,14 @@
             </div>
           </div>
 
-          <div class="flex items-center mb-4">
+         <!--  <div class="flex items-center mb-4">
             <input type="checkbox" id="terms" required
               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
             <label for="terms" class="ml-2 text-sm text-gray-600">
               I agree to the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#"
                 class="text-blue-600 hover:underline">Privacy Policy</a>
             </label>
-          </div>
+          </div> -->
 
           <button type="submit"
             class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -182,7 +182,7 @@
 
       setTimeout(() => {
         alert.remove();
-      }, 3000);
+      }, 5000);
     }
   
 
@@ -191,8 +191,6 @@
 
   const loginemail = document.querySelector("input[name='loginemail']").value.trim();
   const loginpassword = document.querySelector("input[name='loginpassword']").value.trim();
-
-  console.log("Login data:", { loginemail, loginpassword });
 
   try {
     const response = await fetch('/signin', {
@@ -209,7 +207,7 @@
     if (!response.ok) {
       throw new Error(data.error || "Login failed");
     }
-    window.location.href = "/home"; 
+    window.location.href = "/"; 
     showAlert("Logged in Successfully!", "success");
     console.log("Success:", data);
   } catch (error) {
@@ -226,6 +224,7 @@
   const email = document.querySelector("input[name='email']").value.trim();
   const password = document.getElementById("signup-password").value.trim();
   const confirm = document.getElementById("signup-confirm").value.trim();
+  
 
   try {
     const response = await fetch('/signup', {

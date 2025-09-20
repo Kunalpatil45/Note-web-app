@@ -1,100 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Notes </title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>My Notes App</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <style>
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: white;
+      font-weight: bold;
+      user-select: none;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
 
-  <!-- Navbar -->
-  <!-- <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-      <a href="/" class="text-xl sm:text-2xl font-bold text-blue-700 hover:text-blue-800 transition">NotesApp</a>
+<body style="background-color: #D9E9FF;">
 
-      <div class="flex items-center space-x-3 sm:space-x-4">
-        
-        <span id="userInfo" class="text-gray-700 text-sm sm:text-base font-medium hidden xs:inline">
-          Hello, <span class="text-blue-700">Loading...</span>
-        </span>
-        <button id="logoutBtn" class="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-md text-sm sm:text-base hover:bg-red-600">
-          Logout
-        </button>
-      </div>
-    </div>
-  </nav> -->
-
-  <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-    <a href="/" class="text-xl sm:text-2xl font-bold text-blue-700 hover:text-blue-800 transition">NotesApp</a>
-
-    <div class="flex items-center space-x-3 sm:space-x-4">
-      <!-- Profile picture -->
-      <img 
-        id="profilePic"
-        src="https://www.gravatar.com/avatar/?d=mp&s=200" 
-        alt="Profile"
-        class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-gray-300 object-cover"
-      />
-
-      <!-- User info -->
-      <span id="userInfo" class="text-gray-700 text-sm sm:text-base font-medium hidden xs:inline">
-        Hello, <span class="text-blue-700">Loading...</span>
-      </span>
-
-      <!-- Logout button -->
-      <button id="logoutBtn" class="bg-red-500 text-white px-2 sm:px-3 py-1 rounded-md text-sm sm:text-base hover:bg-red-600">
-        Logout
+  <!-- ✅ NAVBAR (unchanged) -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="/">
+        <i class="fas fa-sticky-note me-2"></i>NotesApp
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
       </button>
-    </div>
-  </div>
-</nav>
-
-  <!-- Main content -->
-  <main class="flex-grow pt-24 max-w-6xl mx-auto px-4 sm:px-6 w-full">
-
-    <!-- Create Note Section -->
-    <section class="bg-white rounded-xl shadow-lg p-6 sm:p-8 mb-10">
-      <h1 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 text-center">Create a New Note</h1>
-
-      <form id="noteForm" class="space-y-5 max-w-3xl mx-auto">
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          required
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm sm:text-base"
-        />
-        <textarea
-          name="content"
-          rows="6"
-          placeholder="Write your note here..."
-          required
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition resize-none text-sm sm:text-base"
-        ></textarea>
-        <button
-          type="submit"
-          class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition transform hover:scale-105 shadow-lg text-sm sm:text-base"
-        >
-          Add Note
-        </button>
-      </form>
-    </section>
-
-    <!-- Notes Section -->
-    <section>
-      <h2 class="text-xl sm:text-2xl font-semibold text-blue-700 mb-6 text-center">Your Notes</h2>
-      <div id="notesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        <!-- Notes will be injected here -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/create-note">Create Note</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/profile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/#" id="logoutBtn">Logout</a>
+          </li>
+          <li class="nav-item ms-3">
+            <div class="profile-icon" title="User Name">U</div>
+          </li>
+        </ul>
       </div>
-      <p id="noNotesMsg" class="text-gray-500 text-center mt-6 sm:mt-8 hidden text-sm sm:text-base">No notes to show.</p>
-    </section>
+    </div>
+  </nav>
+
+  <!-- ✅ MAIN CONTENT -->
+  <main class="container" style="padding-top: 90px;">
+    <div id="alert-container" style="position: fixed; top: 80px; right: 20px; z-index: 1050;"></div>
+    <!-- Create Note Form -->
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0 mb-5">
+          <div class="card-body p-4">
+            <h4 class="card-title mb-4 fw-bold text-center text-primary">Create a New Note</h4>
+            <form id="noteForm">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Title</label>
+                <input type="text" name="title" class="form-control" placeholder="Enter note title" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Content</label>
+                <textarea name="content" rows="5" class="form-control" placeholder="Write your note here..." required
+                  style="height: 150px; resize: none; overflow-y: auto;"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                Add Note
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes List -->
+    <h3 class="fw-bold mb-4 text-center text-primary">Your Notes</h3>
+    <div class="row g-4" id="notesContainer">
+      <!-- Notes will be inserted here dynamically -->
+    </div>
+    <p id="noNotesMsg" class="text-muted text-center mt-4 d-none">
+      No notes to show.
+    </p>
 
   </main>
 
-  <!-- Scripts -->
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ✅ SCRIPT -->
   <script>
 
     function showAlert(message, type = "primary") {
@@ -117,20 +128,38 @@
 
     // Fetch logged-in user info
     async function fetchUser() {
-      try {
-        const res = await fetch("/me", { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          document.querySelector("#userInfo span").textContent = data.name;
-        } else {
-          window.location.href = "/";
-        }
-      } catch (err) {
-        console.error(err);
-      }
+  try {
+    const res = await fetch("/me", { credentials: "include" });
+    if (!res.ok) {
+      window.location.href = "/Signup"; // only redirect here if token invalid
+      return;
+    }
+    const user = await res.json();
+    console.log(user);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
+    function showAlert(message, type = "primary") {
+      const container = document.getElementById("alert-container");
+
+      const alert = document.createElement("div");
+      alert.className = `alert alert-${type} alert-dismissible fade show shadow-lg mb-2`;
+      alert.role = "alert";
+      alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+
+      container.appendChild(alert);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
     }
 
-    // Fetch notes
     async function fetchNotes() {
       try {
         const res = await fetch("/notes", { credentials: "include" });
@@ -141,20 +170,26 @@
         if (res.ok) {
           const notes = await res.json();
           if (notes.length === 0) {
-            msg.classList.remove("hidden");
+            msg.classList.remove("d-none");
           } else {
-            msg.classList.add("hidden");
+            msg.classList.add("d-none");
             notes.forEach(note => {
-              const div = document.createElement("div");
-              div.className = "bg-white rounded-lg shadow-md p-4 sm:p-6 flex flex-col justify-between hover:shadow-xl transition-shadow";
+              const col = document.createElement("div");
+              col.className = "col-md-4";
 
-              div.innerHTML = `
-                <h3 class="text-base sm:text-lg font-semibold text-blue-700 mb-3 truncate" title="${note.title}">
-                  ${note.title}
-                </h3>
-                <p class="text-gray-700 mb-4 text-sm sm:text-base">${note.content}</p>
+              col.innerHTML = `
+                <div class="card h-100 shadow-sm border-0">
+                  <div class="card-body">
+                    <h5 class="card-title fw-bold text-primary">${note.title}</h5>
+                    
+                  </div>
+                  <div class="card-footer bg-transparent d-flex justify-content-between">
+                    <small class="text-muted">Created: ${new Date(note.createdAt).toLocaleDateString()}</small>
+                    <a href="/note.html?id=${note._id}" class="btn btn-sm btn-outline-primary">View</a>
+                  </div>
+                </div>
               `;
-              container.appendChild(div);
+              container.appendChild(col);
             });
           }
         }
@@ -163,7 +198,6 @@
       }
     }
 
-    // Handle note form submit
     document.getElementById("noteForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -179,24 +213,39 @@
 
       if (res.ok) {
         e.target.reset();
-        showAlert("Note created successfully!", "success");
+        showAlert("Note created successfully", "success");
         fetchNotes();
       } else {
-        showAlert("Failed to create note.", "danger");
+        showAlert("Error creating note", "danger");
       }
     });
 
-    // Handle logout
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await fetch("/logout", { method: "POST", credentials: "include" });
-      showAlert("Logged out successfully.", "success");
-      window.location.href = "/";
-    });
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    // Initial load
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const res = await fetch('/logout', {
+        method: 'POST',
+        credentials: 'include' // send cookies
+      });
+
+      if (res.ok) {
+        showAlert('Logged out successfully', 'success');
+        window.location.href = '/Signup'; // redirect to signup/login
+      } else {
+        const data = await res.json();
+        showAlert('Logout failed: ' + (data.message || 'Unknown error'), 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert('Logout error: ' + err.message, 'danger');
+    }
+  });
+
     fetchUser();
     fetchNotes();
   </script>
 
 </body>
+
 </html>

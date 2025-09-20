@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile - NotesApp</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: white;
+      font-weight: bold;
+      user-select: none;
+      font-size: 1rem;
+    }
+
+    .profile-card {
+      max-width: 400px;
+      margin: 50px auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      padding: 60px 20px 30px; /* top padding increased for image */
+      text-align: center;
+      position: relative;
+    }
+
+    .profile-card img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      position: absolute;
+      top: -70px; /* half of image height */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+    }
+
+    .profile-card h4 {
+      font-size: 1.8rem;
+      margin-top: 90px; /* space for profile image */
+      font-weight: 700;
+      color: #4f46e5;
+    }
+
+    .profile-card p {
+      color: #555;
+      margin-bottom: 5px;
+      font-size: 0.95rem;
+    }
+
+    #passwordSection input {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body class="bg-light" style="padding-top: 100px;">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="/">
+        <i class="fas fa-sticky-note me-2"></i>NotesApp
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link text-dark" href="/create-note">Create Note</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="/profile">Profile</a></li>
+          <li class="nav-item"><a class="nav-link text-dark" href="/logout">Logout</a></li>
+          <li class="nav-item ms-3">
+            <div class="profile-icon" id="navbarProfileIcon">U</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="alert-container" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index:1050;"></div>
+
+  <!-- Profile Card -->
+  <div class="profile-card">
+    <img src="" id="profilePic" alt="Profile Picture" />
+    <h4 id="userName"></h4>
+    <p>User ID: <span id="userId"></span></p>
+    <p>Email: <span id="userEmail"></span></p>
+    <button class="btn btn-outline-primary mt-3" id="changePwdBtn">
+      <i class="fas fa-key me-1"></i>Change Password
+    </button>
+
+    <!-- Change Password Fields -->
+    <div id="passwordSection" style="display:none;" class="mt-3">
+      <input type="text" id="otpInput" class="form-control" placeholder="Enter OTP" />
+      <div class="mb-2 position-relative">
+        <input type="password" id="newPwd" class="form-control" placeholder="New Password" />
+        <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor:pointer;"
+          onclick="togglePassword('newPwd', this)">👁️</span>
+      </div>
+      <div class="mb-2 position-relative">
+        <input type="password" id="confirmPwd" class="form-control" placeholder="Confirm Password" />
+        <span class="position-absolute top-50 end-0 translate-middle-y me-2" style="cursor:pointer;"
+          onclick="togglePassword('confirmPwd', this)">👁️</span>
+      </div>
+      <button class="btn btn-success mt-2 w-100" id="savePwdBtn">Save Password</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+  <script>
+    function togglePassword(fieldId, icon) {
+      const input = document.getElementById(fieldId);
+      if (input.type === "password") { input.type = "text"; icon.textContent = "🙈"; }
+      else { input.type = "password"; icon.textContent = "👁️"; }
+    }
+
+    function showAlert(message, type = "primary") {
+      const container = document.getElementById("alert-container");
+      const alert = document.createElement("div");
+      alert.className = `alert alert-${type} alert-dismissible fade show shadow-lg mb-2`;
+      alert.role = "alert";
+      alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+      container.appendChild(alert);
+      setTimeout(() => { alert.remove(); }, 5000);
+    }
+
+    async function fetchUser() {
+      try {
+        const res = await fetch("/me", { credentials: "include" });
+        if (!res.ok) { window.location.href = "/Signup"; return; }
+        const user = await res.json();
+
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userId').textContent = user.userId;
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('navbarProfileIcon').textContent = user.name[0].toUpperCase();
+
+        const hash = md5(user.email.trim().toLowerCase());
+        const profilePic = document.getElementById('profilePic');
+        profilePic.src = `https://www.gravatar.com/avatar/${hash}?s=200&d=identicon`;
+        profilePic.onerror = function () { this.src = ''; this.style.background = '#4f46e5'; this.textContent = user.name[0].toUpperCase(); };
+
+      } catch (err) { console.error(err); }
+    }
+
+    fetchUser();
+
+    const changePwdBtn = document.getElementById('changePwdBtn');
+    const passwordSection = document.getElementById('passwordSection');
+    const savePwdBtn = document.getElementById('savePwdBtn');
+
+    changePwdBtn.addEventListener('click', async () => {
+      const email = document.getElementById('userEmail').textContent.trim();
+      if (!email) { showAlert("Email not found!", "danger"); return; }
+      try {
+        const res = await fetch('/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (res.ok) { alert(data.message); passwordSection.style.display = 'block'; }
+        else showAlert('Error: ' + data.message, "danger");
+      } catch (err) { console.error(err); }
+    });
+
+    savePwdBtn.addEventListener('click', async () => {
+      const email = document.getElementById('userEmail').textContent.trim();
+      const otp = document.getElementById('otpInput').value.trim();
+      const newPwd = document.getElementById('newPwd').value.trim();
+      const confirmPwd = document.getElementById('confirmPwd').value.trim();
+
+      if (!otp || !newPwd || !confirmPwd) { showAlert("All fields are required!", "danger"); return; }
+      if (newPwd !== confirmPwd) { showAlert("Passwords did not match!", "danger"); return; }
+
+      try {
+        const res = await fetch('/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp, newPassword: newPwd })
+        });
+        const data = await res.json();
+        if (res.ok) { showAlert(data.message, "success"); passwordSection.style.display = 'none'; }
+        else showAlert('Error: ' + data.message, "danger");
+      } catch (err) { showAlert('Error: ' + err.message, "danger"); console.error(err); }
+    });
+
+    const logoutBtn = document.getElementById('logoutBtn');
+
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const res = await fetch('/logout', {
+        method: 'POST',
+        credentials: 'include' // send cookies
+      });
+
+      if (res.ok) {
+        showAlert('Logged out successfully', 'success');
+        window.location.href = '/Signup'; // redirect to signup/login
+      } else {
+        const data = await res.json();
+        showAlert('Logout failed: ' + (data.message || 'Unknown error'), 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert('Logout error: ' + err.message, 'danger');
+    }
+  });
+  </script>
+</body>
+
+</html>

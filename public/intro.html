@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NotesApp - Introduction</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0f7ff 0%, #d6e4ff 100%);
+      min-height: 100vh;
+    }
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .profile-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: white;
+      font-weight: bold;
+      user-select: none;
+    }
+    .feature-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+      padding: 2rem;
+      height: 100%;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="/">
+        <i class="fas fa-sticky-note me-2"></i>NotesApp
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" href="/create-note">Create Note</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/#" id="logoutBtn">Logout</a>
+          </li>
+          <li class="nav-item ms-3">
+            <div class="profile-icon" title="User  Name">U</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <main class="container" style="padding-top: 100px; padding-bottom: 60px;">
+    <div class="text-center mb-5">
+      <h1 class="display-4 fw-bold text-primary">Welcome to NotesApp</h1>
+      <p class="lead text-secondary">Your personal note-taking web application to create, edit, delete, and export notes easily.</p>
+    </div>
+
+    <section class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card text-center">
+          <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+          <h5>Create Notes</h5>
+          <p>Easily create new notes with a simple and intuitive interface.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card text-center">
+          <i class="fas fa-edit fa-3x text-primary mb-3"></i>
+          <h5>Edit Notes</h5>
+          <p>Modify your notes anytime to keep your information up to date.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card text-center">
+          <i class="fas fa-trash-alt fa-3x text-primary mb-3"></i>
+          <h5>Delete Notes</h5>
+          <p>Remove notes you no longer need with a secure deletion process.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card text-center">
+          <i class="fas fa-file-export fa-3x text-primary mb-3"></i>
+          <h5>Export Notes</h5>
+          <p>Save your notes as TXT files to your device for offline access.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card text-center">
+          <i class="fas fa-folder-open fa-3x text-primary mb-3"></i>
+          <h5>Organize Notes</h5>
+          <p>Categorize and manage your notes efficiently with tags and folders.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card text-center">
+          <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+          <h5>Secure</h5>
+          <p>Your notes are protected with secure authentication and privacy measures.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="text-center mt-5">
+      <a href="/create-note" class="btn btn-primary btn-lg px-5 py-3">
+        <i class="fas fa-plus me-2"></i>Create Your First Note
+      </a>
+    </div>
+  </main>
+  <footer class="bg-light text-center text-dark py-4 mt-5 shadow-sm">
+    <p class="mb-0">
+      If you observe any issues or want to report feedback, contact me on 
+      <a href="https://www.instagram.com/kunalpatil.45" target="_blank" class="text-primary fw-bold">
+        Instagram
+      </a>.
+    </p>
+  </footer>
+
+
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const logoutBtn = document.getElementById('logoutBtn');
+
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const res = await fetch('/logout', {
+        method: 'POST',
+        credentials: 'include' // send cookies
+      });
+
+      if (res.ok) {
+        showAlert('Logged out successfully', 'success');
+        window.location.href = '/Signup'; // redirect to signup/login
+      } else {
+        const data = await res.json();
+        showAlert('Logout failed: ' + (data.message || 'Unknown error'), 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert('Logout error: ' + err.message, 'danger');
+    }
+  });
+  </script>
+</body>
+
+</html>
