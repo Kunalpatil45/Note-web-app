@@ -123,7 +123,7 @@ app.post("/signin", async (req, res) => {
 });
 
 
-app.get('/', authMiddleware, (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, "public", "intro.html"));
 });
 
