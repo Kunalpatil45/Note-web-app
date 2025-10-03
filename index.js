@@ -1,6 +1,3 @@
-
-
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -12,8 +9,12 @@ const User = require('./models/User');
 const cookieParser = require('cookie-parser');
 const authMiddleware = require('./middleware/auth'); 
 const nodemailer = require("nodemailer");
-const Note = require('./models/Note'); // Note model
+const Note = require('./models/Note'); 
+const crypto = require('crypto'); // ✅ change this line
 
+
+const algorithm = "aes-256-cbc";
+const secretKey = process.env.ENCRYPTION_KEY
 
 const app = express();
 
@@ -45,44 +46,71 @@ async function generateUserId(name) {
   return userId;
 }
 
+function encrypt(text) {
+  const iv = crypto.randomBytes(16); // random initialization vector
+  const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey), iv);
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return iv.toString("hex") + ":" + encrypted; // store both IV and encrypted text
+}
+
+function decrypt(text) {
+  const [ivHex, encryptedText] = text.split(":");
+  const iv = Buffer.from(ivHex, "hex");
+  const decipher = crypto.createDecipheriv(algorithm, Buffer.from(secretKey), iv);
+  let decrypted = decipher.update(encryptedText, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+}
+
+
+
+
+
 app.post("/signup", async (req, res) => {
   console.log("Signup route hit");
   let { name, email, password, confirmPass } = req.body;
   console.log("Received data:", req.body);
 
+  if (!name || !email || !password || !confirmPass) {
+    return res.status(400).json({ success: false, message: "Name, email, and password are required" });
+  }
+
   if (password !== confirmPass) {
     return res.status(400).json({ success: false, message: "Passwords do not match" });
   }
 
-  if (!name || !email || !password || !confirmPass) {
-    return res.status(400).json({ error: "Name, email, and password are required" });
+  // ✅ Password strength validation
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  if (!strongPasswordRegex.test(password)) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Password must be strong. It should contain at least 8 characters, including uppercase, lowercase, number, and special character."
+    });
   }
 
   try {
     let existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists with this email" });
+      return res.status(400).json({ success: false, message: "User already exists with this email" });
     }
 
-    // Generate unique userId based on name
     const userId = await generateUserId(name);
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save new user
     let newUser = new User({ name, email, password: hashedPassword, userId });
     const savedUser = await newUser.save();
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
       message: "User registered!",
-      userId: savedUser.userId   // send generated userId
+      userId: savedUser.userId
     });
-
-  } catch (err) {
-    console.error("Signup error:", err);
-    res.status(500).json({ error: "Internal server error" });
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ success: false, message: "Server error during signup" });
   }
 });
 
@@ -377,17 +405,22 @@ app.get("/signup", (req, res) => {
 app.post("/create", authMiddleware, async (req, res) => {
   try {
     const { title, content } = req.body;
+
+    const encryptedContent = encrypt(content);
+
     const newNote = new Note({
       title,
-      content,
+      content: encryptedContent,
       user: req.user.userId,
     });
+
     await newNote.save();
+
     res.json({
       _id: newNote._id,
       title: newNote.title,
-      content: newNote.content,
-      createdAt: newNote.createdAt, // send created date
+      content: content, // send decrypted content back for UI
+      createdAt: newNote.createdAt,
     });
   } catch (err) {
     console.error(err);
@@ -396,15 +429,29 @@ app.post("/create", authMiddleware, async (req, res) => {
 });
 
 
+
+
 app.get("/notes", authMiddleware, async (req, res) => {
   try {
     const notes = await Note.find({ user: req.user.userId }).sort({ createdAt: -1 });
-    res.json(notes);
+
+    // Decrypt each note’s content
+    const decryptedNotes = notes.map(note => ({
+      _id: note._id,
+      title: note.title,
+      content: decrypt(note.content),
+      createdAt: note.createdAt,
+    }));
+
+    res.json(decryptedNotes);
   } catch (err) {
     console.error("Error fetching notes:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 
 app.get("/note/:id", authMiddleware, async (req, res) => {
   try {
@@ -412,12 +459,21 @@ app.get("/note/:id", authMiddleware, async (req, res) => {
     if (!note || note.user.toString() !== req.user.userId) {
       return res.status(404).json({ error: "Note not found" });
     }
-    res.json(note);
+
+    res.json({
+      _id: note._id,
+      title: note.title,
+      content: decrypt(note.content),
+      createdAt: note.createdAt,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching note:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+
 
 app.put("/note/:id", authMiddleware, async (req, res) => {
   try {
@@ -427,16 +483,24 @@ app.put("/note/:id", authMiddleware, async (req, res) => {
     }
 
     const { title, content } = req.body;
+
     if (title) note.title = title;
-    if (content) note.content = content;
+    if (content) note.content = encrypt(content); // 🔒 encrypt before saving
 
     await note.save();
-    res.json(note);
+
+    res.json({
+      _id: note._id,
+      title: note.title,
+      content: decrypt(note.content),
+      createdAt: note.createdAt,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Error updating note:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 
 app.delete("/note/:id", authMiddleware, async (req, res) => {

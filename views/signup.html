@@ -4,51 +4,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account Authentication</title>
+  <title>Note App - Authentication</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    .form-container {
-      transition: all 0.3s ease;
-    }
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(to bottom right, #eef2ff, #e0e7ff);
+    background-attachment: fixed;
+  }
 
-    .form-hidden {
-      opacity: 0;
-      transform: translateX(20px);
-      pointer-events: none;
-      position: absolute;
-      width: 100%;
-    }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
 
-    .form-visible {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: all;
-      position: relative;
-    }
+  .form-container {
+    transition: all 0.3s ease;
+  }
 
-    .password-toggle {
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
+  .form-hidden {
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+  }
 
-    .password-toggle:hover {
-      color: #3b82f6;
-    }
+  .form-visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+    position: relative;
+  }
 
-    .input-field:focus {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
+  .password-toggle {
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .password-toggle:hover {
+    color: #3b82f6;
+  }
+
+  .input-field:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
   </style>
 </head>
 
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
   <div id="alert-container" class="fixed top-4 right-4 w-auto z-50"></div>
+
   <div class="w-full max-w-md mx-auto">
-    <!-- Header with Toggle -->
     <div class="bg-white rounded-t-xl shadow-lg p-6 text-center">
+
+      <!-- 📝 App Heading -->
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">📝 Note App</h1>
+      <p class="text-gray-500 mb-6">Create and manage your notes easily</p>
+
+      <!-- Toggle Buttons -->
       <div class="flex space-x-4 mb-6">
         <button id="signup-btn"
           class="flex-1 py-3 px-4 rounded-lg bg-blue-600 text-white font-semibold shadow-md transition-all duration-300 hover:bg-blue-700 transform hover:scale-105">
@@ -61,8 +83,11 @@
       </div>
 
       <div class="relative">
-        <!-- Sign Up Form -->
+
+        <!-- 🟢 Signup Form -->
         <form method="POST" onsubmit="submitForm(event)" id="signup-form" class="form-container form-visible space-y-4">
+         
+
           <div class="text-left">
             <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
             <div class="relative">
@@ -92,7 +117,7 @@
               <i class="fas fa-eye-slash password-toggle absolute right-3 top-3 text-gray-400"
                 onclick="togglePassword('signup-password', this)"></i>
             </div>
-            <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+            
           </div>
 
           <div class="text-left">
@@ -106,23 +131,16 @@
             </div>
           </div>
 
-         <!--  <div class="flex items-center mb-4">
-            <input type="checkbox" id="terms" required
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-            <label for="terms" class="ml-2 text-sm text-gray-600">
-              I agree to the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#"
-                class="text-blue-600 hover:underline">Privacy Policy</a>
-            </label>
-          </div> -->
-
           <button type="submit"
             class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
             Create Account
           </button>
         </form>
 
-        <!-- Sign In Form -->
+        <!-- 🔵 Signin Form -->
         <form method="post" onsubmit="loginhandler(event)" id="signin-form" class="form-container form-hidden space-y-4">
+          
+
           <div class="text-left">
             <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
             <div class="relative">
@@ -158,16 +176,14 @@
             Sign In
           </button>
         </form>
+
       </div>
     </div>
-
   </div>
 
   <script>
-
-
-  
-  function showAlert(message, type = "primary") {
+    // Bootstrap alert function
+    function showAlert(message, type = "primary") {
       const container = document.getElementById("alert-container");
 
       const alert = document.createElement("div");
@@ -184,76 +200,67 @@
         alert.remove();
       }, 5000);
     }
-  
 
-   async function loginhandler(event) {
-  event.preventDefault();
+    // 🔵 Login handler
+    async function loginhandler(event) {
+      event.preventDefault();
 
-  const loginemail = document.querySelector("input[name='loginemail']").value.trim();
-  const loginpassword = document.querySelector("input[name='loginpassword']").value.trim();
+      const loginemail = document.querySelector("input[name='loginemail']").value.trim();
+      const loginpassword = document.querySelector("input[name='loginpassword']").value.trim();
 
-  try {
-    const response = await fetch('/signin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: loginemail, password: loginpassword }),
+      try {
+        const response = await fetch('/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: loginemail, password: loginpassword }),
+        });
 
-    });
+        const data = await response.json();
 
-    const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Login failed");
 
-    if (!response.ok) {
-      throw new Error(data.error || "Login failed");
-    }
-    window.location.href = "/"; 
-    showAlert("Logged in Successfully!", "success");
-    console.log("Success:", data);
-  } catch (error) {
-    console.error("Login error:", error);
-    showAlert("Login failed: " + error.message, "danger");
-  }
-}
-
-
-  async function submitForm(event) {
-  event.preventDefault();
-
-  const fullName = document.querySelector("input[name='name']").value.trim();
-  const email = document.querySelector("input[name='email']").value.trim();
-  const password = document.getElementById("signup-password").value.trim();
-  const confirm = document.getElementById("signup-confirm").value.trim();
-  
-
-  try {
-    const response = await fetch('/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: fullName, email, password ,confirmPass: confirm}),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Signup failed");
-    }
-    else{
-      showAlert("Account created successfully! Please sign in.", "success");
-      document.getElementById('signin-btn').click();
+        showAlert("✅ Logged in Successfully!", "success");
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Login error:", error);
+        showAlert("Login failed: " + error.message, "danger");
+      }
     }
 
-    console.log("Success:", data);
-  } catch (error) {
-    console.error("Signup error:", error);
-    showAlert("Signup failed: " + error.message, "danger");
-  }
-}
+    // 🟢 Signup handler
+    async function submitForm(event) {
+      event.preventDefault();
 
+      const fullName = document.querySelector("input[name='name']").value.trim();
+      const email = document.querySelector("input[name='email']").value.trim();
+      const password = document.getElementById("signup-password").value.trim();
+      const confirm = document.getElementById("signup-confirm").value.trim();
 
+      try {
+        const response = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: fullName, email, password, confirmPass: confirm }),
+        });
 
+        const data = await response.json();
+
+        if (!response.ok || data.success === false) {
+          const msg = data.message || data.error || "Signup failed";
+          showAlert(msg, "danger");
+          return;
+        }
+
+        showAlert("✅ Account created successfully! Please sign in.", "success");
+        document.getElementById('signin-btn').click();
+
+      } catch (error) {
+        console.error("Signup error:", error);
+        showAlert("Signup failed: " + error.message, "danger");
+      }
+    }
+
+    // Password visibility toggle
     function togglePassword(inputId, icon) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
@@ -267,6 +274,7 @@
       }
     }
 
+    // Tab toggling
     document.getElementById('signup-btn').addEventListener('click', function () {
       this.classList.add('bg-blue-600', 'text-white');
       this.classList.remove('bg-gray-200', 'text-gray-700');
@@ -290,27 +298,6 @@
       document.getElementById('signup-form').classList.remove('form-visible');
       document.getElementById('signup-form').classList.add('form-hidden');
     });
-
-    
-    document.getElementById('signup-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const password = document.getElementById('signup-password').value;
-      const confirm = document.getElementById('signup-confirm').value;
-
-      if (password !== confirm) {
-        showAlert("Passwords do not match!", "danger");
-        return;
-      }
-
-      if (password.length < 8) {
-        /* alert('Password must be at least 8 characters long!'); */
-        showAlert("Password must be at least 8 characters long!", "danger");
-        return;
-      }
-
-    });
-
-
   </script>
 </body>
 
