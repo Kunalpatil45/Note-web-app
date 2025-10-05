@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banned Song Reports</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+        }
+        table {
+            width: 80%;
+            margin: 2rem auto;
+            border-collapse: collapse;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #333;
+            text-align: left;
+        }
+        thead {
+            background-color: #1f1f1f;
+        }
+        th {
+            font-weight: 600;
+            color: #bb86fc;
+        }
+        tbody tr {
+            background-color: #1e1e1e;
+        }
+        tbody tr:nth-of-type(even) {
+            background-color: #242424;
+        }
+        tbody tr:hover {
+            background-color: #3a3a3a;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎵 Banned Song Reports</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Song Name</th>
+                <th>Song ID</th>
+                <th>Reported At</th>
+            </tr>
+        </thead>
+        <tbody id="report-body">
+            </tbody>
+    </table>
+
+    <script>
+        // This script runs after the HTML page has loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('report-body');
+
+            // Fetch the report data from our new API endpoint
+            fetch('/api/reports')
+                .then(response => response.json())
+                .then(reports => {
+                    if (reports.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No reports found.</td></tr>';
+                        return;
+                    }
+
+                    // Clear any existing rows
+                    tbody.innerHTML = '';
+
+                    // Loop through each report and create a table row
+                    reports.forEach(report => {
+                        const tr = document.createElement('tr');
+
+                        // Format the date to be more readable
+                        const formattedDate = new Date(report.reportedAt).toLocaleString();
+
+                        tr.innerHTML = `
+                            <td>${report.songName}</td>
+                            <td>${report.songId}</td>
+                            <td>${formattedDate}</td>
+                        `;
+
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching reports:', error);
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: #cf6679;">Failed to load reports.</td></tr>';
+                });
+        });
+    </script>
+
+</body>
+</html>

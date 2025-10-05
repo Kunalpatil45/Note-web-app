@@ -11,6 +11,7 @@ const authMiddleware = require('./middleware/auth');
 const nodemailer = require("nodemailer");
 const Note = require('./models/Note'); 
 const crypto = require('crypto'); // ✅ change this line
+const BannedSong = require('./models/BannedSongSchema'); // NEW
 
 
 const algorithm = "aes-256-cbc";
@@ -296,6 +297,9 @@ app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, "views", "signup.html"));
 });
 
+app.get('/songs', (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "songs.html"));
+});
 
 app.get('/forget-password', (req, res) => {
   res.sendFile(path.join(__dirname, "views", "forget-password.html"));
@@ -518,6 +522,37 @@ app.delete("/note/:id", authMiddleware, async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+app.post('/report/banned-song', async (req, res) => {
+  try {
+    const { songName, songId } = req.body;
+    if (!songName || !songId) {
+      return res.status(400).json({ message: 'Missing songName or songId.' });
+    }
+    const newReport = new BannedSong({ songName, songId });
+    await newReport.save();
+    console.log(`📝 Report saved: ${songName} (${songId})`);
+    res.status(201).json({ message: 'Report saved successfully.' });
+  } catch (error) {
+    console.error('Error saving report:', error);
+    res.status(500).json({ message: 'Server error while saving report.' });
+  }
+});
+
+// 2. GET Route: Fetches all reports from the database (NEW)
+app.get('/api/reports', async (req, res) => {
+  try {
+    // Find all reports and sort them by most recent first
+    const reports = await BannedSong.find({}).sort({ reportedAt: -1 });
+    res.json(reports); // Send the reports back as JSON
+  } catch (error) {
+    console.error('Error fetching reports:', error);
+    res.status(500).json({ message: 'Server error while fetching reports.' });
+  }
+});
+
+
 
 const PORT = process.env.PORT || 5000;
 
