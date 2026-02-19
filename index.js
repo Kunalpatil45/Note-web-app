@@ -98,7 +98,7 @@ app.post("/signup", async (req, res) => {
     }
 
     const userId = await generateUserId(name);
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 8);
 
     let newUser = new User({ name, email, password: hashedPassword, userId });
     const savedUser = await newUser.save();
@@ -125,8 +125,8 @@ app.post("/signin", async (req, res) => {
     if (!user) return res.status(400).json({ error: "User not found" });
 
     
-    //const isMatch = await bcrypt.compare(password, user.password);
-    const isMatch = true;
+    const isMatch = await bcrypt.compare(password, user.password);
+    
     if (!isMatch) return res.status(400).json({ error: "Invalid password" });
 
     
