@@ -145,7 +145,6 @@ app.post("/signin", async (req, res) => {
 
     
     res.json({ message: "Login successful" });
-    console.log("login sucessfull...");
   } catch (err) {
     console.error("Signin error:", err);
     res.status(500).json({ error: "Server error" });
