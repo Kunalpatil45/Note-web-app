@@ -137,7 +137,7 @@ app.post("/signin",authLimiter, async (req, res) => {
 
     
     const token = jwt.sign(
-      { userId: user._id, name: user.name },
+      { userId: user._id, name: user.name, email: user.email },
       process.env.JWT_SECRET || "secret_jwt_key",
       { expiresIn: "1d" }
     );
@@ -174,13 +174,10 @@ app.get('/create-note', authMiddleware, (req, res) => {
 
 app.get("/me", authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select("name email userId"); 
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    res.json({ 
-      name: user.name, 
-      email: user.email, 
-      userId: user.userId 
+    res.json({
+      name: req.user.name,
+      email: req.user.email,
+      userId: req.user.userId
     });
   } catch (err) {
     console.error("Error in /me:", err);
