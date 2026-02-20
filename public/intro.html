@@ -147,12 +147,12 @@
     try {
       const res = await fetch('/logout', {
         method: 'POST',
-        credentials: 'include' // send cookies
+        credentials: 'include' 
       });
 
       if (res.ok) {
         showAlert('Logged out successfully', 'success');
-        window.location.href = '/Signup'; // redirect to signup/login
+        window.location.href = '/Signup'; 
       } else {
         const data = await res.json();
         showAlert('Logout failed: ' + (data.message || 'Unknown error'), 'danger');

@@ -133,7 +133,7 @@
   try {
     const res = await fetch("/me", { credentials: "include" });
     if (!res.ok) {
-      window.location.href = "/Signup"; // only redirect here if token invalid
+      window.location.href = "/Signup"; 
       return;
     }
     const user = await res.json();
@@ -235,7 +235,7 @@ fetchUser();
         });
         if (res.ok) {
           showAlert('Note deleted successfully', 'success');
-          window.location.href = '/';
+          window.location.href = '/create-note';
         } else {
           showAlert('Error deleting note', 'danger');
         }
@@ -262,12 +262,12 @@ fetchUser();
     try {
       const res = await fetch('/logout', {
         method: 'POST',
-        credentials: 'include' // send cookies
+        credentials: 'include'
       });
 
       if (res.ok) {
         showAlert('Logged out successfully', 'success');
-        window.location.href = '/Signup'; // redirect to signup/login
+        window.location.href = '/Signup'; 
       } else {
         const data = await res.json();
         showAlert('Logout failed: ' + (data.message || 'Unknown error'), 'danger');
