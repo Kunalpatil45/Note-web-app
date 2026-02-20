@@ -31,22 +31,6 @@ const userSchema = new mongoose.Schema({
     otpExpire: Date
 });
 
-// Pre-save hook to generate userId automatically
-userSchema.pre("save", async function (next) {
-    if (!this.isNew) return next();
-
-    // Take username, lowercase, remove spaces, and add 4-digit random number
-    const baseId = this.name.toLowerCase().replace(/\s+/g, "");
-    const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit number
-    this.userId = `${baseId}${randomNum}`;
-
-    // Ensure uniqueness
-    const existingUser = await mongoose.model("User").findOne({ userId: this.userId });
-    if (existingUser) {
-        this.userId = `${baseId}${Date.now().toString().slice(-4)}`; // fallback
-    }
-
-    next();
-});
+userSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', userSchema);
