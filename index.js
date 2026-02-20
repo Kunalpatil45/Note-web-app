@@ -11,6 +11,7 @@ const authMiddleware = require('./middleware/auth');
 const nodemailer = require("nodemailer");
 const Note = require('./models/Note'); 
 const crypto = require('crypto'); 
+const rateLimit = require("express-rate-limit"); 
 
 
 const algorithm = "aes-256-cbc";
@@ -25,6 +26,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
 
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,   // 1 minute
+  max: 10,                   // max 10 requests per IP per minute
+  message: { error: "Too many requests, try again later." }
+});
 
 async function generateUserId(name) {
   
@@ -67,7 +73,7 @@ function decrypt(text) {
 
 
 
-app.post("/signup", async (req, res) => {
+app.post("/signup", authLimiter, async (req, res) => {
   console.log("Signup route hit");
   let { name, email, password, confirmPass } = req.body;
   console.log("Received data:", req.body);
@@ -116,7 +122,7 @@ app.post("/signup", async (req, res) => {
 
 
 
-/* app.post("/signin", async (req, res) => {
+app.post("/signin",authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -150,49 +156,7 @@ app.post("/signup", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
- */
 
-app.post("/signin", async (req, res) => {
-  try {
-    console.time("TOTAL_LOGIN");
-
-    const { email, password } = req.body;
-
-    console.time("DB_LOOKUP");
-    const user = await User.findOne({ email });
-    console.timeEnd("DB_LOOKUP");
-
-    if (!user) return res.status(400).json({ error: "User not found" });
-
-    console.time("BCRYPT_COMPARE");
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.timeEnd("BCRYPT_COMPARE");
-
-    if (!isMatch) return res.status(400).json({ error: "Invalid password" });
-
-    console.time("JWT_SIGN");
-    const token = jwt.sign(
-      { userId: user._id, name: user.name },
-      process.env.JWT_SECRET || "secret_jwt_key",
-      { expiresIn: "1d" }
-    );
-    console.timeEnd("JWT_SIGN");
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-    });
-
-    console.timeEnd("TOTAL_LOGIN");
-
-    res.json({ message: "Login successful" });
-
-  } catch (err) {
-    console.error("Signin error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, "public", "intro.html"));
